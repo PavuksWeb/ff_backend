@@ -6,10 +6,10 @@
 
 ## Technologies
 
-- **Backend:** Next.js API Routes
+- **Backend:** NestJS + Prisma for better scaling
 - **LLM:** OpenAI GPT-4o-mini
 - **Moderation:** Banned word pairs with support for obfuscation, leet, and repeated letters
-- **Streaming:** Web socket via Socket.io
+- **Streaming:** Web socket via Socket.io for persistent connection between user and server
 - **Docker:** Project is containerized for quick setup
 
 ---
