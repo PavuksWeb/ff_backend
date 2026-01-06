@@ -1,9 +1,5 @@
-import {
-  BadRequestException,
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import { findViolations, tokenize } from 'src/utils/moderation';
 
 @Injectable()
@@ -23,7 +19,7 @@ export class ModerationGuard implements CanActivate {
     const violations = findViolations(tokens, rules);
 
     if (violations.length > 0) {
-      throw new BadRequestException({
+      throw new WsException({
         code: 'MODERATION_VIOLATION',
         violations,
       });

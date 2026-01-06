@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -12,7 +12,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ConversationService } from 'src/conversation/conversation';
 import { CreateMessageDto } from 'src/conversation/dto/createMessageDto';
-import { ModerationGuard } from 'src/conversation/moderation.guard';
+import { WsExceptionFilter } from 'src/conversation/filters/wsException.filter';
+import { ModerationGuard } from 'src/conversation/guards/moderation.guard';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class AppGateway
@@ -35,8 +36,9 @@ export class AppGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @UseGuards(ModerationGuard)
   @SubscribeMessage('send_message')
+  @UseGuards(ModerationGuard)
+  @UseFilters(WsExceptionFilter)
   async handleSendMessage(
     @MessageBody() dto: CreateMessageDto,
     @ConnectedSocket() client: Socket,
