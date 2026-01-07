@@ -8,6 +8,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ConversationService } from 'src/conversation/conversation';
@@ -43,14 +44,24 @@ export class AppGateway
     @MessageBody() dto: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const result = await this.conversationService.sendAndSaveMessage(
-      dto.message,
-    );
-
-    client.emit('message_created', {
-      role: 'assistant',
-      message: result.assistantMessage.text,
-      id: result.assistantMessage.id,
-    });
+    try {
+      const result = await this.conversationService.sendAndSaveMessage(
+        dto.message,
+      );
+      client.emit('message_created', {
+        role: 'assistant',
+        message: result.assistantMessage.text,
+        id: result.assistantMessage.id,
+      });
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (err?.status === 429) {
+        throw new WsException({
+          code: 'TOO_MANY_REQUESTS',
+          message: 'Too many requests. Try later.',
+        });
+      }
+      throw err;
+    }
   }
 }

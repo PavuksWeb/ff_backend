@@ -7,7 +7,8 @@ export class WsExceptionFilter extends BaseWsExceptionFilter {
   catch(exception: WsException, host: ArgumentsHost) {
     const client = host.switchToWs().getClient<Socket>();
     const error = exception.getError();
+    console.log(error);
 
-    client.emit('moderation_error', error);
+    client.emit('ws_error', error);
   }
 }
