@@ -34,6 +34,7 @@ export async function sendMessage(userText?: string) {
   const moderation = await checkModeration(userText);
 
   if (moderation.flagged) {
+    console.log(moderation.flagged);
     throw new Error(
       `MODERATION_BLOCKED: ${JSON.stringify(moderation.categories)}`,
     );

@@ -1,5 +1,6 @@
 import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -38,12 +39,15 @@ export class AppGateway
   @SubscribeMessage('send_message')
   @UseGuards(ModerationGuard)
   @UseFilters(WsExceptionFilter)
-  async handleSendMessage(@MessageBody() dto: CreateMessageDto) {
+  async handleSendMessage(
+    @MessageBody() dto: CreateMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
     const result = await this.conversationService.sendAndSaveMessage(
       dto.message,
     );
 
-    this.server.emit('message_created', {
+    client.emit('message_created', {
       role: 'assistant',
       message: result.assistantMessage.text,
       id: result.assistantMessage.id,
