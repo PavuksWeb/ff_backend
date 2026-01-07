@@ -14,14 +14,36 @@ const messages: ChatCompletionMessageParam[] = [
   },
 ];
 
+async function checkModeration(text: string) {
+  const response = await openai.moderations.create({
+    model: 'omni-moderation-latest',
+    input: text,
+  });
+
+  const result = response.results[0];
+
+  return {
+    flagged: result.flagged,
+    categories: result.categories,
+  };
+}
+
 export async function sendMessage(userText?: string) {
-  if (userText) {
-    const newMessage: ChatCompletionMessageParam = {
-      role: 'user',
-      content: userText,
-    };
-    messages.push(newMessage);
+  if (!userText) return;
+
+  const moderation = await checkModeration(userText);
+
+  if (moderation.flagged) {
+    throw new Error(
+      `MODERATION_BLOCKED: ${JSON.stringify(moderation.categories)}`,
+    );
   }
+
+  const newMessage: ChatCompletionMessageParam = {
+    role: 'user',
+    content: userText,
+  };
+  messages.push(newMessage);
 
   const response = openai.chat.completions.create({
     model: 'gpt-4o-mini',
