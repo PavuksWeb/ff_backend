@@ -54,7 +54,7 @@ export async function sendMessage(userText?: string) {
   const assistantReply = (await response).choices[0].message.content;
 
   if (!assistantReply) {
-    return;
+    throw new Error('FAILED TO REPLY. TRY AGAIN LATER.');
   }
 
   messages.push({ role: 'assistant', content: assistantReply });
