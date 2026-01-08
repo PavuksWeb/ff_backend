@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppGateway } from './app.gateway';
+import { AppGateway } from './service/app.gateway.service';
 import { ConversationModule } from 'src/conversation/conversation.module';
 
 @Module({

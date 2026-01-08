@@ -11,10 +11,10 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ConversationService } from 'src/conversation/conversation';
-import { CreateMessageDto } from 'src/conversation/dto/createMessageDto';
-import { WsExceptionFilter } from 'src/conversation/filters/wsException.filter';
-import { ModerationGuard } from 'src/conversation/guards/moderation.guard';
+import { ConversationService } from 'src/conversation/service/conversation.service';
+import { CreateMessageDto } from 'src/message/dto/createMessageDto';
+import { WsExceptionFilter } from 'src/message/filters/wsException.filter';
+import { ModerationGuard } from 'src/message/guards/moderation.guard';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class AppGateway
@@ -45,13 +45,8 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const result = await this.conversationService.sendAndSaveMessage(
-        dto.message,
-      );
-      client.emit('message_created', {
-        role: 'assistant',
-        message: result.assistantMessage.text,
-        id: result.assistantMessage.id,
+      await this.conversationService.sendAndStreamMessage(dto, (chunk) => {
+        client.emit('message_stream', chunk);
       });
     } catch (err) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -62,6 +57,8 @@ export class AppGateway
         });
       }
       throw err;
+    } finally {
+      client.emit('stream_end');
     }
   }
 }
