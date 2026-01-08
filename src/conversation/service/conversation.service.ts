@@ -14,7 +14,6 @@ export class ConversationService {
     dto: CreateMessageDto,
     onDelta: (chunk: string) => void,
   ) {
-    console.log('DTO', dto);
     await this.messageService.createUserMessage(dto);
 
     const messages = await this.messageService.getLLMContext();
