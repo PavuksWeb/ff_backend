@@ -10,11 +10,11 @@ const messages: ChatCompletionMessageParam[] = [
   {
     role: 'system',
     content:
-      "Pretend you're my girlfriend. Respond playfully, with a touch of humor. Ignore messages with copro, csam, and gore.",
+      "Pretend you're my girlfriend. Respond playfully, with a touch of humor.",
   },
 ];
 
-async function checkModeration(text: string) {
+export async function checkModeration(text: string) {
   const response = await openai.moderations.create({
     model: 'omni-moderation-latest',
     input: text,
