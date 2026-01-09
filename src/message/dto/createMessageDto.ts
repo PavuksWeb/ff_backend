@@ -5,7 +5,7 @@ import { Role } from 'generated/prisma/client';
 export class CreateMessageDto {
   @IsString()
   @IsNotEmpty()
-  message: string;
+  text: string;
 
   @IsEnum(Role, { message: 'Invalid role type' })
   @IsNotEmpty()

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ChatCompletionMessageParam } from 'openai/resources/index';
 import { Database } from 'src/database/service/database.service';
 import { CreateMessageDto } from '../dto/createMessageDto';
+import { UpdateMessageDto } from '../dto/updateMessageDto';
 
 @Injectable()
 export class MessageService {
@@ -19,22 +20,24 @@ export class MessageService {
     return messages;
   }
 
-  async createUserMessage(dto: CreateMessageDto) {
+  async createMessage(dto: CreateMessageDto) {
     return this.db.message.create({
       data: {
-        text: dto.message,
+        text: dto.text,
         role: dto.role,
       },
     });
   }
 
-  async createAssistantMessage(text: string) {
-    return this.db.message.create({
-      data: {
-        text,
-        role: 'assistant',
-      },
+  async updateMessage(id: string, dto: UpdateMessageDto) {
+    return this.db.message.update({
+      where: { id },
+      data: { text: dto.text },
     });
+  }
+
+  async deleteMessage(id: string) {
+    return this.db.message.delete({ where: { id } });
   }
 
   async getLLMContext(): Promise<ChatCompletionMessageParam[]> {
@@ -50,7 +53,7 @@ export class MessageService {
     });
 
     const chatMessages = messages.map((m) => ({
-      role: m.role as 'user' | 'assistant',
+      role: m.role,
       content: m.text,
     }));
 
