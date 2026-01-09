@@ -5,8 +5,8 @@ import { findViolations, tokenize } from 'src/utils/moderation';
 @Injectable()
 export class ModerationGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const data = context.switchToWs().getData<{ message: string }>();
-    const message = data.message;
+    const data = context.switchToWs().getData<{ text: string }>();
+    const message = data.text;
 
     const tokens = tokenize(message);
 
